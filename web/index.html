@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Local Application Tracker</title>
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <main class="shell">
+    <header class="hero">
+      <div>
+        <p class="eyebrow">LOCAL APPLICATION TRACKER</p>
+        <h1>简历驱动的投递管理</h1>
+        <p class="lead">简历在本机解析，岗位按技能匹配，投递进展可由邮箱同步或手工更新。</p>
+      </div>
+      <div class="actions">
+        <button class="button" id="demoMailBtn">载入演示邮件</button>
+        <button class="button" id="exportBtn">导出 JSON</button>
+        <label class="button file-button">导入 JSON<input type="file" id="importInput" accept="application/json"></label>
+      </div>
+    </header>
+
+    <section class="resume-card card">
+      <div class="section-heading"><div><h2>1. 上传你的简历</h2><p>支持 Markdown、TXT、HTML 和 JSON。文件只在本地读取，不会上传到云端。</p></div><span class="privacy-badge">本地解析</span></div>
+      <div class="resume-controls">
+        <label class="button primary file-button">选择简历文件<input type="file" id="resumeInput" accept=".md,.markdown,.txt,.html,.htm,.json,text/plain,text/markdown,text/html,application/json"></label>
+        <button class="button" id="recommendBtn">根据简历生成推荐</button>
+        <span id="resumeFileName" class="muted">尚未选择文件</span>
+      </div>
+      <textarea id="resumeText" rows="5" placeholder="也可以直接粘贴简历文本，然后点击“根据简历生成推荐”。"></textarea>
+      <div id="resumeProfile" class="profile-box muted">等待简历内容。未上传时将使用内置演示候选池。</div>
+    </section>
+
+    <nav class="tabs" aria-label="功能导航">
+      <button class="tab active" data-tab="tracker">投递追踪</button>
+      <button class="tab" data-tab="mail">邮箱同步</button>
+      <button class="tab" data-tab="history">历史批次</button>
+      <button class="tab" data-tab="about">隐私与说明</button>
+    </nav>
+
+    <section id="tracker" class="panel active">
+      <div class="metrics">
+        <div class="metric card"><span>当前批次</span><strong id="batchNo">1</strong><small>始终保持 5 家</small></div>
+        <div class="metric card"><span>已勾选</span><strong><span id="checkedCount">0</span> / 5</strong><div class="bar"><i id="progressBar"></i></div></div>
+        <div class="metric card"><span>简历命中技能</span><strong id="skillCount">0</strong><small id="skillHint">等待简历</small></div>
+        <div class="metric card"><span>邮箱消息</span><strong id="mailCount">0</strong><small>本地快照</small></div>
+      </div>
+      <div class="card table-card">
+        <div class="section-heading"><div><h2>当前推荐岗位</h2><p id="recommendationHint">勾选 5 家后自动载入下一批；推荐分数来自你上传的简历关键词与岗位标签。</p></div><span id="batchLabel" class="batch-label"></span></div>
+        <div class="table-wrap"><table><thead><tr><th>已投递</th><th>企业 / 地区</th><th>建议岗位</th><th>匹配依据</th><th>匹配分</th><th>进展</th><th>入口</th></tr></thead><tbody id="candidateBody"></tbody></table></div>
+      </div>
+    </section>
+
+    <section id="mail" class="panel">
+      <div class="card">
+        <div class="section-heading"><div><h2>2. 同步主流邮箱</h2><p>程序在本机通过 IMAP 读取邮件标题和摘要，密码只存在于本次请求内。</p></div><span class="privacy-badge">不发送 / 不删除</span></div>
+        <form id="mailForm" class="mail-form">
+          <label>提供商<select id="provider"></select></label>
+          <label>邮箱账号<input id="username" type="email" autocomplete="off" required placeholder="name@example.com"></label>
+          <label>授权码 / 应用专用密码<input id="password" type="password" autocomplete="off" required></label>
+          <label>IMAP 服务器<input id="host" required></label>
+          <label>端口<input id="port" type="number" min="1" max="65535" required></label>
+          <label>文件夹<input id="folder" value="INBOX"></label>
+          <label>最近几天<input id="sinceDays" type="number" min="1" max="3650" value="60"></label>
+          <label>最多读取<input id="limit" type="number" min="1" max="300" value="100"></label>
+          <div class="form-actions"><button class="button primary" type="submit">开始同步</button><span id="providerNote" class="muted"></span></div>
+        </form>
+        <div id="mailError" class="error" hidden></div>
+      </div>
+      <div class="card"><div class="section-heading"><div><h2>邮箱进展</h2><p>识别规则会把招聘邮件归类为已投递、测评、笔试、面试、Offer 或拒绝。</p></div></div><div id="mailList" class="mail-list"><p class="muted">尚未同步邮件。</p></div></div>
+    </section>
+
+    <section id="history" class="panel"><div class="card"><div class="section-heading"><div><h2>历史批次</h2><p>每个候选批次全部勾选后自动归档。</p></div></div><div class="table-wrap"><table><thead><tr><th>批次</th><th>企业</th><th>岗位</th><th>勾选时间</th><th>最终状态</th></tr></thead><tbody id="historyBody"></tbody></table></div></div></section>
+
+    <section id="about" class="panel"><div class="card about"><h2>隐私与开源边界</h2><ul><li>简历文本和邮箱凭据不会写入 Git 仓库；默认只保存技能摘要、投递状态和邮箱标题摘要。</li><li>Gmail、Outlook/Microsoft 365、QQ、163 和阿里云企业邮箱使用 IMAP 预设；若服务商要求 OAuth，请使用应用专用密码或后续 OAuth 适配器。</li><li>发布 GitHub 前请删除真实简历、真实邮件、附件、授权码、OAuth token 和内部招聘链接。</li></ul></div></section>
+    <footer>Local Application Tracker · MIT License · 仅在本机运行</footer>
+  </main>
+  <div id="toast" class="toast" role="status"></div>
+  <script src="/app.js"></script>
+</body>
+</html>
