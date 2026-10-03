@@ -35,7 +35,7 @@
     <nav class="tabs" aria-label="功能导航">
       <button class="tab active" data-tab="tracker">投递追踪</button>
       <button class="tab" data-tab="mail">邮箱同步</button>
-      <button class="tab" data-tab="history">历史批次</button>
+      <button class="tab" data-tab="history">历史批次</button><button class="tab" data-tab="prefs">偏好设置</button>
       <button class="tab" data-tab="about">隐私与说明</button>
     </nav>
 
@@ -71,7 +71,7 @@
       <div class="card"><div class="section-heading"><div><h2>邮箱进展</h2><p>识别规则会把招聘邮件归类为已投递、测评、笔试、面试、Offer 或拒绝。</p></div></div><div id="mailList" class="mail-list"><p class="muted">尚未同步邮件。</p></div></div>
     </section>
 
-    <section id="history" class="panel"><div class="card"><div class="section-heading"><div><h2>历史批次</h2><p>每个候选批次全部勾选后自动归档。</p></div></div><div class="table-wrap"><table><thead><tr><th>批次</th><th>企业</th><th>岗位</th><th>勾选时间</th><th>最终状态</th></tr></thead><tbody id="historyBody"></tbody></table></div></div></section>
+    <section id="history" class="panel"><div class="card"><div class="section-heading"><div><h2>历史批次</h2><p>每个候选批次全部勾选后自动归档。</p></div></div><div class="table-wrap"><table><thead><tr><th>批次</th><th>企业</th><th>岗位</th><th>勾选时间</th><th>最终状态</th></tr></thead><tbody id="historyBody"></tbody></table></div></div></section><section id="prefs" class="panel"><div class="card"><div class="section-heading"><div><h2>推荐偏好设置</h2><p>默认优先大厂、央企、国企和知名企业；融资初创仅在融资阶段已核实或你关闭限制后参与排序。</p></div></div><div class="preference-grid"><label><input type="checkbox" id="prefLarge" checked> 大厂</label><label><input type="checkbox" id="prefCentral" checked> 央企</label><label><input type="checkbox" id="prefState" checked> 国企</label><label><input type="checkbox" id="prefKnown" checked> 知名企业</label><label><input type="checkbox" id="prefStartup"> 融资初创</label></div><div class="preference-row"><label>初创最低融资阶段<select id="prefFunding"><option value="angel">天使轮及以上</option><option value="A">A 轮及以上</option><option value="B">B 轮及以上</option><option value="any">不限制轮次</option></select></label><label class="inline-check"><input type="checkbox" id="prefVerified" checked> 仅纳入已核实融资阶段的初创公司</label><button class="button primary" id="applyPrefsBtn">应用偏好</button></div><p class="muted">企业层级和融资元数据是可编辑的推荐元数据，不等同于录用承诺；公开信息不完整时，程序会标记“阶段未核实”并按你的设置处理。</p></div></section>
 
     <section id="about" class="panel"><div class="card about"><h2>隐私与开源边界</h2><ul><li>简历文本和邮箱凭据不会写入 Git 仓库；默认只保存技能摘要、投递状态和邮箱标题摘要。</li><li>Gmail、Outlook/Microsoft 365、QQ、163 和阿里云企业邮箱使用 IMAP 预设；若服务商要求 OAuth，请使用应用专用密码或后续 OAuth 适配器。</li><li>发布 GitHub 前请删除真实简历、真实邮件、附件、授权码、OAuth token 和内部招聘链接。</li></ul></div></section>
     <footer>Local Application Tracker · MIT License · 仅在本机运行</footer>
@@ -80,4 +80,5 @@
   <script src="/app.js"></script>
 </body>
 </html>
+
 
