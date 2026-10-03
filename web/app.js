@@ -40,14 +40,19 @@ const candidatePool = [
   {id:"nio",company:"蔚来",city:"上海 / 合肥",region:"长三角",role:"智能驾驶 / 视觉感知 / 机器人算法",tags:["autonomous_driving","vision","stereo3d","pose","edgeai","cpp"],url:"https://www.nio.com/careers"}
 ];
 
+const candidateKeywordHints = {
+  zhito:["视觉","SLAM","感知","标定","3D","姿态","机器人","控制","IMU"], inovance:["AI","机器人","运动控制","嵌入式","C++","实时"], dreame:["视觉","机器人","智能算法","端侧","嵌入式"], xiaopeng:["智能驾驶","3D","视觉","机器人","感知","控制"], smartsens:["ISP","图像","相机","机器视觉","C++"], xag:["视觉","机器人","导航","无人机","IMU","控制"], tcl:["AI","图像","机器人","嵌入式","ISP"], zte:["AI","软件","端侧","嵌入式","大模型"], quectel:["嵌入式","物联网","AI","通信","视觉"], "cmcc-hz":["具身智能","机器人","大模型","推理"], gac:["自动驾驶","3D","视觉","车辆控制","感知"], ehang:["飞行器","无人机","视觉","导航","控制"], sensetime:["计算机视觉","多模态","端侧 AI","大模型"], thundersoft:["计算机视觉","嵌入式","边缘智能","C++"], huaqin:["相机","影像","图像","ISP","嵌入式"], nio:["智能驾驶","视觉感知","3D","机器人"]
+};
+
 let providers = {};
 let state = loadState();
 let resumeTags = new Set(state.resumeProfile?.tags || []);
+let resumeTerms = new Set(state.resumeProfile?.terms || []);
 
 function freshCandidate(candidate, score = 0, matches = []) { return {...candidate, score, matches, status:"wait", applied:false, checkedAt:""}; }
-function defaultState() { return {current: [], batchIndex: 0, history: [], mail: [], resumeProfile: {tags: [], label: "未上传简历"}}; }
+function defaultState() { return {current: [], batchIndex: 0, history: [], mail: [], resumeProfile: {tags: [], terms: [], label: "未上传简历", summary: ""}}; }
 function loadState() { try { const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || "null"); return saved && Array.isArray(saved.current) ? saved : defaultState(); } catch { return defaultState(); } }
-function saveState() { const safe = {...state, resumeProfile: {tags:[...resumeTags], label: state.resumeProfile?.label || "已解析简历"}}; localStorage.setItem(STORAGE_KEY, JSON.stringify(safe)); }
+function saveState() { const safe = {...state, resumeProfile: {tags:[...resumeTags], terms:[...resumeTerms], label: state.resumeProfile?.label || "已解析简历", summary: state.resumeProfile?.summary || ""}}; localStorage.setItem(STORAGE_KEY, JSON.stringify(safe)); }
 function now() { return new Date().toLocaleString("zh-CN", {hour12:false}); }
 function escapeHtml(value) { return String(value ?? "").replace(/[&<>'"]/g, ch => ({"&":"&amp;","<":"&lt;",">":"&gt;","'":"&#39;","\"":"&quot;"}[ch])); }
 function statusClass(status) { return `status status-${status}`; }
@@ -59,16 +64,29 @@ function extractResumeTags(text) {
   for (const [tag, patterns] of keywordRules) if (patterns.some(pattern => normalized.includes(pattern.toLowerCase()))) found.add(tag);
   return found;
 }
-function scoreCandidates(tags) {
+function extractResumeTerms(text) {
+  const source = text || "";
+  const found = new Set();
+  const add = value => { const term = value.trim().replace(/^[`*_#：:、，,。；;（）()\[\]{}]+|[`*_#：:、，,。；;（）()\[\]{}]+$/g, ""); if (term.length >= 2 && term.length <= 32 && !/^(项目|经历|技能|教育背景|科研成果|核心优势|负责|熟练|掌握|具备|能够|以及|进行|系统)$/.test(term)) found.add(term); };
+  for (const match of source.matchAll(/`([^`]+)`/g)) add(match[1]);
+  for (const match of source.matchAll(/\*\*([^*]+)\*\*/g)) add(match[1]);
+  for (const match of source.matchAll(/\b[A-Za-z][A-Za-z0-9+#./-]{1,31}\b/g)) add(match[0]);
+  for (const match of source.matchAll(/[一-龥]{2,12}(?:算法|模型|系统|标定|控制|融合|部署|重建|识别|检测|跟踪|推理|优化|通信|导航|测量|感知)/g)) add(match[0]);
+  return found;
+}
+function scoreCandidates(tags, terms) {
   return candidatePool.map(candidate => {
-    const matches = candidate.tags.filter(tag => tags.has(tag));
-    const score = Math.min(99, matches.length * 12 + (candidate.region.includes("珠三角") || candidate.region.includes("长三角") ? 5 : 0));
+    const tagMatches = candidate.tags.filter(tag => tags.has(tag));
+    const hints = candidateKeywordHints[candidate.id] || [];
+    const termMatches = hints.filter(hint => [...terms].some(term => term.toLowerCase().includes(hint.toLowerCase()) || hint.toLowerCase().includes(term.toLowerCase())));
+    const matches = [...new Set([...tagMatches, ...termMatches.map(term => `术语:${term}`)])].slice(0, 10);
+    const score = Math.min(99, tagMatches.length * 12 + termMatches.length * 5 + (candidate.region.includes("珠三角") || candidate.region.includes("长三角") ? 5 : 0));
     return freshCandidate(candidate, score, matches);
   }).sort((a,b)=>b.score-a.score || a.company.localeCompare(b.company,"zh-CN"));
 }
 function chooseNextBatch() {
   const used = new Set(state.history.map(item=>item.id));
-  const ranked = scoreCandidates(resumeTags);
+  const ranked = scoreCandidates(resumeTags, resumeTerms);
   const available = ranked.filter(item=>!used.has(item.id));
   const selected = available.slice(0,5);
   if (selected.length < 5) selected.push(...ranked.filter(item=>!selected.some(x=>x.id===item.id)).slice(0,5-selected.length));
@@ -76,20 +94,24 @@ function chooseNextBatch() {
 }
 function applyResumeText(text, label) {
   resumeTags = extractResumeTags(text);
-  state.resumeProfile = {tags:[...resumeTags], label:label || "已解析简历"};
+  resumeTerms = extractResumeTerms(text);
+  const summary = [...resumeTerms].slice(0, 14).join("、");
+  state.resumeProfile = {tags:[...resumeTags], terms:[...resumeTerms], label:label || "已解析简历", summary};
   state.current = chooseNextBatch();
   state.batchIndex = state.history.length ? Math.floor(state.history.length / 5) : 0;
   saveState(); renderAll();
-  toast(`已识别 ${resumeTags.size} 类技能，并生成 5 家推荐`);
+  toast(`已提取 ${resumeTags.size} 类标签和 ${resumeTerms.size} 个技术术语，并生成 5 家推荐`);
 }
 
 function renderProfile() {
   const box = document.getElementById("resumeProfile");
   const labels = [...resumeTags].map(tag => `<span class="tag">${escapeHtml(tag)}</span>`).join("");
-  box.innerHTML = resumeTags.size ? `已识别技能标签：${labels}<div class="muted" style="margin-top:6px">推荐排序会使用这些标签与岗位标签的重合度；原始简历文本不会写入导出 JSON。</div>` : "等待简历内容。未上传时将使用内置演示候选池。";
+  const terms = [...resumeTerms].slice(0, 24).map(term => `<span class="tag">${escapeHtml(term)}</span>`).join("");
+  box.innerHTML = resumeTags.size || resumeTerms.size ? `<div><strong>分类标签：</strong>${labels || "未命中预设分类"}</div><div style="margin-top:7px"><strong>自动提取术语：</strong>${terms || "未提取到技术术语"}</div><div class="muted" style="margin-top:8px">分类标签用于稳定排序，技术术语用于补充匹配；两者都来自当前简历文本，原始简历不会写入导出 JSON。</div>` : "等待简历内容。程序会提取分类标签和原文技术术语；未上传时将使用内置演示候选池。";
   document.getElementById("skillCount").textContent = resumeTags.size;
-  document.getElementById("skillHint").textContent = state.resumeProfile?.label || "等待简历";
+  document.getElementById("skillHint").textContent = `${resumeTerms.size} 个术语 · ${state.resumeProfile?.label || "等待简历"}`;
 }
+
 function renderCandidates() {
   const current = state.current.length === 5 ? state.current : chooseNextBatch();
   state.current = current;
@@ -102,7 +124,7 @@ function renderCandidates() {
     <td><label class="check"><input type="checkbox" data-apply="${i}" ${x.applied?"checked":""}>我已投递</label><small class="muted">${x.checkedAt ? `勾选于 ${escapeHtml(x.checkedAt)}` : ""}</small></td>
     <td><div class="company">${escapeHtml(x.company)}</div><div class="city">${escapeHtml(x.city)} · <span class="tag">${escapeHtml(x.region)}</span></div></td>
     <td><strong>${escapeHtml(x.role)}</strong></td>
-    <td>${x.matches?.length ? `命中：${x.matches.map(m=>`<span class="tag">${escapeHtml(m)}</span>`).join("")}` : "等待简历关键词匹配"}</td>
+    <td>${x.matches?.length ? `命中：${x.matches.map(m=>`<span class="tag">${escapeHtml(m)}</span>`).join("")}` : "等待简历摘要匹配"}</td>
     <td class="score">${x.score || 0}</td>
     <td><select data-status="${i}">${Object.entries(statusLabels).map(([key,label])=>`<option value="${key}" ${x.status===key?"selected":""}>${label}</option>`).join("")}</select><div style="margin-top:5px"><span class="${statusClass(x.status)}">${statusLabels[x.status]}</span></div></td>
     <td><a href="${escapeHtml(x.url)}" target="_blank" rel="noopener">官方入口 ↗</a></td>
@@ -149,7 +171,7 @@ document.getElementById("recommendBtn").addEventListener("click",()=>applyResume
 document.getElementById("mailForm").addEventListener("submit",async event=>{ event.preventDefault(); const error=document.getElementById("mailError"); error.hidden=true; const form=new FormData(event.target); const payload=Object.fromEntries(form.entries()); payload.port=Number(payload.port); payload.sinceDays=Number(payload.sinceDays); payload.limit=Number(payload.limit); try { const data=await syncMail(payload); state.mail=data.messages || []; matchMailToApplications(); saveState(); renderAll(); document.getElementById("password").value=""; toast(`同步完成：${data.count || 0} 封`); } catch (err) { error.textContent=err.message; error.hidden=false; } });
 document.getElementById("demoMailBtn").addEventListener("click",loadDemoMail);
 document.getElementById("exportBtn").addEventListener("click",()=>{ const blob=new Blob([JSON.stringify(state,null,2)],{type:"application/json"}); const a=document.createElement("a"); a.style.display="none"; a.href=URL.createObjectURL(blob); a.download=`application-tracker-${new Date().toISOString().slice(0,10)}.json`; document.body.appendChild(a); a.click(); setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); },1000); });
-document.getElementById("importInput").addEventListener("change",async event=>{ const file=event.target.files?.[0]; if(!file)return; try { const imported=JSON.parse(await file.text()); if(!Array.isArray(imported.current)) throw new Error("文件缺少 current 字段"); state=imported; resumeTags=new Set(state.resumeProfile?.tags || []); saveState(); renderAll(); toast("已导入本地进度"); } catch(err) { toast(`导入失败：${err.message}`); } });
+document.getElementById("importInput").addEventListener("change",async event=>{ const file=event.target.files?.[0]; if(!file)return; try { const imported=JSON.parse(await file.text()); if(!Array.isArray(imported.current)) throw new Error("文件缺少 current 字段"); state=imported; resumeTags=new Set(state.resumeProfile?.tags || []); resumeTerms=new Set(state.resumeProfile?.terms || []); saveState(); renderAll(); toast("已导入本地进度"); } catch(err) { toast(`导入失败：${err.message}`); } });
 document.querySelectorAll(".tab").forEach(tab=>tab.addEventListener("click",()=>{ document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active")); document.querySelectorAll(".panel").forEach(x=>x.classList.remove("active")); tab.classList.add("active"); document.getElementById(tab.dataset.tab).classList.add("active"); }));
 
 if (!state.current.length) { state.current = chooseNextBatch(); saveState(); }
