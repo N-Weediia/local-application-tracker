@@ -1,0 +1,44 @@
+{
+  "gmail": {
+    "label": "Gmail",
+    "host": "imap.gmail.com",
+    "port": 993,
+    "folder": "INBOX",
+    "authNote": "使用应用专用密码或 OAuth；普通密码通常不可用。"
+  },
+  "outlook": {
+    "label": "Outlook / Microsoft 365",
+    "host": "outlook.office365.com",
+    "port": 993,
+    "folder": "INBOX",
+    "authNote": "优先使用 OAuth 或应用专用密码，具体取决于租户策略。"
+  },
+  "qq": {
+    "label": "QQ 邮箱",
+    "host": "imap.qq.com",
+    "port": 993,
+    "folder": "INBOX",
+    "authNote": "需要在 QQ 邮箱设置中开启 IMAP 并生成授权码。"
+  },
+  "netease163": {
+    "label": "网易 163",
+    "host": "imap.163.com",
+    "port": 993,
+    "folder": "INBOX",
+    "authNote": "需要在邮箱设置中开启 IMAP 并生成客户端授权密码。"
+  },
+  "aliyun": {
+    "label": "阿里云企业邮箱",
+    "host": "imap.qiye.aliyun.com",
+    "port": 993,
+    "folder": "INBOX",
+    "authNote": "企业管理员可能需要先开放 IMAP。"
+  },
+  "custom": {
+    "label": "自定义 IMAP",
+    "host": "",
+    "port": 993,
+    "folder": "INBOX",
+    "authNote": "适用于学校、公司或其他 IMAP 服务。"
+  }
+}
