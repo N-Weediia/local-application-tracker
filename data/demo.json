@@ -1,0 +1,12 @@
+{
+  "current": [
+    {"id":"demo-1","company":"示例视觉科技","city":"苏州","region":"长三角","role":"视觉算法工程师","match":"双目几何、3D 姿态和端侧推理","url":"https://example.com/careers","aliases":["示例视觉科技"],"status":"wait","applied":false,"checkedAt":""},
+    {"id":"demo-2","company":"示例机器人","city":"深圳","region":"珠三角","role":"机器人感知算法","match":"多传感器融合、IMU、控制和 C++","url":"https://example.com/careers","aliases":["示例机器人"],"status":"wait","applied":false,"checkedAt":""},
+    {"id":"demo-3","company":"示例智能硬件","city":"上海","region":"长三角","role":"图像 / ISP 算法","match":"相机标定、OpenCV、图像处理和硬件同步","url":"https://example.com/careers","aliases":["示例智能硬件"],"status":"wait","applied":false,"checkedAt":""},
+    {"id":"demo-4","company":"示例自动驾驶","city":"广州","region":"珠三角","role":"3D 感知算法","match":"目标检测、跟踪、3D 重建和时空模型","url":"https://example.com/careers","aliases":["示例自动驾驶"],"status":"wait","applied":false,"checkedAt":""},
+    {"id":"demo-5","company":"示例工业自动化","city":"南京","region":"长三角","role":"机器人 / 运动控制算法","match":"因子图、滤波、实时通信和嵌入式开发","url":"https://example.com/careers","aliases":["示例工业自动化"],"status":"wait","applied":false,"checkedAt":""}
+  ],
+  "batchIndex": 0,
+  "history": [],
+  "mail": []
+}
