@@ -40,6 +40,14 @@ const candidatePool = [
   {id:"nio",company:"蔚来",city:"上海 / 合肥",region:"长三角",role:"智能驾驶 / 视觉感知 / 机器人算法",tags:["autonomous_driving","vision","stereo3d","pose","edgeai","cpp"],url:"https://www.nio.com/careers"}
 ];
 
+const companyProfiles = {
+  zhito:{type:"融资初创", funding:"unknown", verified:false, fundingLabel:"融资阶段未核实"}, inovance:{type:"知名企业", funding:"listed", verified:true, fundingLabel:"上市企业"}, dreame:{type:"知名企业", funding:"unknown", verified:false, fundingLabel:"融资阶段未核实"}, xiaopeng:{type:"大厂", funding:"listed", verified:true, fundingLabel:"上市企业"}, smartsens:{type:"知名企业", funding:"listed", verified:true, fundingLabel:"上市企业"}, xag:{type:"融资初创", funding:"unknown", verified:false, fundingLabel:"融资阶段未核实"}, tcl:{type:"大厂", funding:"listed", verified:true, fundingLabel:"上市企业"}, zte:{type:"大厂", funding:"listed", verified:true, fundingLabel:"上市企业"}, quectel:{type:"知名企业", funding:"listed", verified:true, fundingLabel:"上市企业"}, "cmcc-hz":{type:"央企", funding:"listed", verified:true, fundingLabel:"央企体系"}, gac:{type:"国企", funding:"listed", verified:true, fundingLabel:"国企体系"}, ehang:{type:"知名企业", funding:"listed", verified:true, fundingLabel:"上市企业"}, sensetime:{type:"知名企业", funding:"listed", verified:true, fundingLabel:"上市企业"}, thundersoft:{type:"知名企业", funding:"listed", verified:true, fundingLabel:"上市企业"}, huaqin:{type:"知名企业", funding:"listed", verified:true, fundingLabel:"上市企业"}, nio:{type:"大厂", funding:"listed", verified:true, fundingLabel:"上市企业"}
+};
+const defaultPreferences = {priority:["大厂","央企","国企","知名企业","融资初创"], minFundingStage:"angel", requireFundingVerified:true};
+const fundingRank = {unknown:0, angel:1, A:2, B:3, C:4, listed:5};
+function getPreferences(){ const p=state.preferences || {}; return {priority:Array.isArray(p.priority)&&p.priority.length?p.priority:defaultPreferences.priority, minFundingStage:p.minFundingStage || defaultPreferences.minFundingStage, requireFundingVerified:p.requireFundingVerified !== false}; }
+function eligibleByPreference(candidate){ const profile=companyProfiles[candidate.id] || {type:"知名企业",funding:"unknown",verified:false}; const pref=getPreferences(); if(profile.type === "融资初创" && pref.requireFundingVerified && !profile.verified) return false; return (fundingRank[profile.funding] || 0) >= (fundingRank[pref.minFundingStage] || 1) || profile.type !== "融资初创"; }
+
 const candidateKeywordHints = {
   zhito:["视觉","SLAM","感知","标定","3D","姿态","机器人","控制","IMU"], inovance:["AI","机器人","运动控制","嵌入式","C++","实时"], dreame:["视觉","机器人","智能算法","端侧","嵌入式"], xiaopeng:["智能驾驶","3D","视觉","机器人","感知","控制"], smartsens:["ISP","图像","相机","机器视觉","C++"], xag:["视觉","机器人","导航","无人机","IMU","控制"], tcl:["AI","图像","机器人","嵌入式","ISP"], zte:["AI","软件","端侧","嵌入式","大模型"], quectel:["嵌入式","物联网","AI","通信","视觉"], "cmcc-hz":["具身智能","机器人","大模型","推理"], gac:["自动驾驶","3D","视觉","车辆控制","感知"], ehang:["飞行器","无人机","视觉","导航","控制"], sensetime:["计算机视觉","多模态","端侧 AI","大模型"], thundersoft:["计算机视觉","嵌入式","边缘智能","C++"], huaqin:["相机","影像","图像","ISP","嵌入式"], nio:["智能驾驶","视觉感知","3D","机器人"]
 };
@@ -50,9 +58,9 @@ let resumeTags = new Set(state.resumeProfile?.tags || []);
 let resumeTerms = new Set(state.resumeProfile?.terms || []);
 
 function freshCandidate(candidate, score = 0, matches = []) { return {...candidate, score, matches, status:"wait", applied:false, checkedAt:""}; }
-function defaultState() { return {current: [], batchIndex: 0, history: [], mail: [], resumeProfile: {tags: [], terms: [], label: "未上传简历", summary: ""}}; }
+function defaultState() { return {current: [], batchIndex: 0, history: [], mail: [], preferences: {...defaultPreferences}, resumeProfile: {tags: [], terms: [], label: "未上传简历", summary: ""}}; }
 function loadState() { try { const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || "null"); return saved && Array.isArray(saved.current) ? saved : defaultState(); } catch { return defaultState(); } }
-function saveState() { const safe = {...state, resumeProfile: {tags:[...resumeTags], terms:[...resumeTerms], label: state.resumeProfile?.label || "已解析简历", summary: state.resumeProfile?.summary || ""}}; localStorage.setItem(STORAGE_KEY, JSON.stringify(safe)); }
+function saveState() { const safe = {...state, preferences:getPreferences(), resumeProfile: {tags:[...resumeTags], terms:[...resumeTerms], label: state.resumeProfile?.label || "已解析简历", summary: state.resumeProfile?.summary || ""}}; localStorage.setItem(STORAGE_KEY, JSON.stringify(safe)); }
 function now() { return new Date().toLocaleString("zh-CN", {hour12:false}); }
 function escapeHtml(value) { return String(value ?? "").replace(/[&<>'"]/g, ch => ({"&":"&amp;","<":"&lt;",">":"&gt;","'":"&#39;","\"":"&quot;"}[ch])); }
 function statusClass(status) { return `status status-${status}`; }
@@ -75,14 +83,19 @@ function extractResumeTerms(text) {
   return found;
 }
 function scoreCandidates(tags, terms) {
+  const pref=getPreferences();
   return candidatePool.map(candidate => {
+    if (!eligibleByPreference(candidate)) return null;
+    const profile=companyProfiles[candidate.id] || {type:"知名企业"};
     const tagMatches = candidate.tags.filter(tag => tags.has(tag));
     const hints = candidateKeywordHints[candidate.id] || [];
     const termMatches = hints.filter(hint => [...terms].some(term => term.toLowerCase().includes(hint.toLowerCase()) || hint.toLowerCase().includes(term.toLowerCase())));
     const matches = [...new Set([...tagMatches, ...termMatches.map(term => `术语:${term}`)])].slice(0, 10);
-    const score = Math.min(99, tagMatches.length * 12 + termMatches.length * 5 + (candidate.region.includes("珠三角") || candidate.region.includes("长三角") ? 5 : 0));
+    const priorityIndex = pref.priority.indexOf(profile.type);
+    const priorityScore = priorityIndex < 0 ? 0 : (pref.priority.length - priorityIndex) * 8;
+    const score = Math.min(99, tagMatches.length * 12 + termMatches.length * 5 + priorityScore + (candidate.region.includes("珠三角") || candidate.region.includes("长三角") ? 5 : 0));
     return freshCandidate(candidate, score, matches);
-  }).sort((a,b)=>b.score-a.score || a.company.localeCompare(b.company,"zh-CN"));
+  }).filter(Boolean).sort((a,b)=>b.score-a.score || a.company.localeCompare(b.company,"zh-CN"));
 }
 function chooseNextBatch() {
   const used = new Set(state.history.map(item=>item.id));
@@ -122,7 +135,7 @@ function renderCandidates() {
   document.getElementById("progressBar").style.width = `${checked / 5 * 100}%`;
   document.getElementById("candidateBody").innerHTML = current.map((x,i)=>`<tr>
     <td><label class="check"><input type="checkbox" data-apply="${i}" ${x.applied?"checked":""}>我已投递</label><small class="muted">${x.checkedAt ? `勾选于 ${escapeHtml(x.checkedAt)}` : ""}</small></td>
-    <td><div class="company">${escapeHtml(x.company)}</div><div class="city">${escapeHtml(x.city)} · <span class="tag">${escapeHtml(x.region)}</span></div></td>
+    <td><div class="company">${escapeHtml(x.company)}</div><div class="city">${escapeHtml(x.city)} · <span class="tag">${escapeHtml(x.region)}</span></div><div><span class="tag">${escapeHtml((companyProfiles[x.id]||{}).type || "知名企业")}</span><span class="tag">${escapeHtml((companyProfiles[x.id]||{}).fundingLabel || "阶段未核实")}</span></div></td>
     <td><strong>${escapeHtml(x.role)}</strong></td>
     <td>${x.matches?.length ? `命中：${x.matches.map(m=>`<span class="tag">${escapeHtml(m)}</span>`).join("")}` : "等待简历摘要匹配"}</td>
     <td class="score">${x.score || 0}</td>
@@ -164,7 +177,8 @@ async function syncMail(payload) { const response = await fetch("/api/sync/imap"
 async function loadDemoMail() { const data=await fetch("/api/sync/mock",{method:"POST"}).then(r=>r.json()); state.mail=data.messages || []; matchMailToApplications(); saveState(); renderAll(); toast("已载入演示邮件"); }
 
 function renderHistory() { document.getElementById("historyBody").innerHTML = state.history.length ? state.history.map(x=>`<tr><td>第 ${(x.batch || 0)+1} 批</td><td>${escapeHtml(x.company)}</td><td>${escapeHtml(x.role)}</td><td>${escapeHtml(x.checkedAt || "—")}</td><td><span class="${statusClass(x.status)}">${statusLabels[x.status] || "其他"}</span></td></tr>`).join("") : "<tr><td colspan='5' class='muted'>尚无已完成批次。</td></tr>"; }
-function renderAll() { renderProfile(); renderCandidates(); renderMail(); renderHistory(); }
+function renderPreferences(){ const p=getPreferences(); for(const [id,label] of [["prefLarge","大厂"],["prefCentral","央企"],["prefState","国企"],["prefKnown","知名企业"],["prefStartup","融资初创"]]){ const el=document.getElementById(id); if(el) el.checked=p.priority.includes(label); } const min=document.getElementById("prefFunding"); if(min) min.value=p.minFundingStage; const verified=document.getElementById("prefVerified"); if(verified) verified.checked=p.requireFundingVerified; }
+function renderAll() { renderProfile(); renderCandidates(); renderMail(); renderHistory(); renderPreferences(); }
 
 document.getElementById("resumeInput").addEventListener("change", async event=>{ const file=event.target.files?.[0]; if(!file)return; document.getElementById("resumeFileName").textContent=file.name; document.getElementById("resumeText").value=await file.text(); applyResumeText(document.getElementById("resumeText").value, file.name); });
 document.getElementById("recommendBtn").addEventListener("click",()=>applyResumeText(document.getElementById("resumeText").value,"粘贴/导入的简历"));
@@ -172,6 +186,7 @@ document.getElementById("mailForm").addEventListener("submit",async event=>{ eve
 document.getElementById("demoMailBtn").addEventListener("click",loadDemoMail);
 document.getElementById("exportBtn").addEventListener("click",()=>{ const blob=new Blob([JSON.stringify(state,null,2)],{type:"application/json"}); const a=document.createElement("a"); a.style.display="none"; a.href=URL.createObjectURL(blob); a.download=`application-tracker-${new Date().toISOString().slice(0,10)}.json`; document.body.appendChild(a); a.click(); setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); },1000); });
 document.getElementById("importInput").addEventListener("change",async event=>{ const file=event.target.files?.[0]; if(!file)return; try { const imported=JSON.parse(await file.text()); if(!Array.isArray(imported.current)) throw new Error("文件缺少 current 字段"); state=imported; resumeTags=new Set(state.resumeProfile?.tags || []); resumeTerms=new Set(state.resumeProfile?.terms || []); saveState(); renderAll(); toast("已导入本地进度"); } catch(err) { toast(`导入失败：${err.message}`); } });
+document.getElementById("applyPrefsBtn")?.addEventListener("click",()=>{ const selected=[]; for(const [id,label] of [["prefLarge","大厂"],["prefCentral","央企"],["prefState","国企"],["prefKnown","知名企业"],["prefStartup","融资初创"]]) if(document.getElementById(id)?.checked) selected.push(label); state.preferences={priority:selected.length?selected:defaultPreferences.priority,minFundingStage:document.getElementById("prefFunding").value,requireFundingVerified:document.getElementById("prefVerified").checked}; state.current=chooseNextBatch(); saveState(); renderAll(); toast("偏好已应用，推荐已重新排序"); });
 document.querySelectorAll(".tab").forEach(tab=>tab.addEventListener("click",()=>{ document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active")); document.querySelectorAll(".panel").forEach(x=>x.classList.remove("active")); tab.classList.add("active"); document.getElementById(tab.dataset.tab).classList.add("active"); }));
 
 if (!state.current.length) { state.current = chooseNextBatch(); saveState(); }
