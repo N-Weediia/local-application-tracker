@@ -22,7 +22,7 @@
     </header>
 
     <section class="resume-card card">
-      <div class="section-heading"><div><h2>1. 上传你的简历</h2><p>支持 Markdown、TXT、HTML 和 JSON。文件只在本地读取，不会上传到云端。</p></div><span class="privacy-badge">本地解析</span></div>
+      <div class="section-heading"><div><h2>1. 上传你的简历</h2><p>支持 Markdown、TXT、HTML 和 JSON。程序会在本机提取分类标签和技术术语，不会上传到云端。</p></div><span class="privacy-badge">本地解析</span></div>
       <div class="resume-controls">
         <label class="button primary file-button">选择简历文件<input type="file" id="resumeInput" accept=".md,.markdown,.txt,.html,.htm,.json,text/plain,text/markdown,text/html,application/json"></label>
         <button class="button" id="recommendBtn">根据简历生成推荐</button>
@@ -43,11 +43,11 @@
       <div class="metrics">
         <div class="metric card"><span>当前批次</span><strong id="batchNo">1</strong><small>始终保持 5 家</small></div>
         <div class="metric card"><span>已勾选</span><strong><span id="checkedCount">0</span> / 5</strong><div class="bar"><i id="progressBar"></i></div></div>
-        <div class="metric card"><span>简历命中技能</span><strong id="skillCount">0</strong><small id="skillHint">等待简历</small></div>
+        <div class="metric card"><span>简历提取标签</span><strong id="skillCount">0</strong><small id="skillHint">等待简历</small></div>
         <div class="metric card"><span>邮箱消息</span><strong id="mailCount">0</strong><small>本地快照</small></div>
       </div>
       <div class="card table-card">
-        <div class="section-heading"><div><h2>当前推荐岗位</h2><p id="recommendationHint">勾选 5 家后自动载入下一批；推荐分数来自你上传的简历关键词与岗位标签。</p></div><span id="batchLabel" class="batch-label"></span></div>
+        <div class="section-heading"><div><h2>当前推荐岗位</h2><p id="recommendationHint">勾选 5 家后自动载入下一批；推荐分数来自你上传简历的分类标签、自动提取术语与岗位标签。</p></div><span id="batchLabel" class="batch-label"></span></div>
         <div class="table-wrap"><table><thead><tr><th>已投递</th><th>企业 / 地区</th><th>建议岗位</th><th>匹配依据</th><th>匹配分</th><th>进展</th><th>入口</th></tr></thead><tbody id="candidateBody"></tbody></table></div>
       </div>
     </section>
@@ -80,3 +80,4 @@
   <script src="/app.js"></script>
 </body>
 </html>
+
