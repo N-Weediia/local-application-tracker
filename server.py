@@ -6,6 +6,7 @@ import datetime as dt
 import email
 import email.header
 import email.utils
+from html.parser import HTMLParser
 import imaplib
 import json
 import mimetypes
@@ -25,13 +26,46 @@ def load_providers() -> dict[str, dict[str, Any]]:
     return json.loads(PROVIDERS_PATH.read_text(encoding="utf-8"))
 
 
+def safe_decode(payload: bytes, charset: str | None = None) -> str:
+    """Decode malformed mail bytes without allowing an unknown charset to abort sync."""
+    encoding = charset or "utf-8"
+    try:
+        return payload.decode(encoding, errors="replace")
+    except (LookupError, UnicodeError):
+        for fallback in ("utf-8", "gb18030", "latin-1"):
+            try:
+                return payload.decode(fallback, errors="replace")
+            except (LookupError, UnicodeError):
+                continue
+        return payload.decode("latin-1", errors="replace")
+
+
+class _HTMLTextParser(HTMLParser):
+    def __init__(self) -> None:
+        super().__init__(convert_charrefs=True)
+        self.parts: list[str] = []
+
+    def handle_data(self, data: str) -> None:
+        self.parts.append(data)
+
+
+def html_to_text(value: str) -> str:
+    parser = _HTMLTextParser()
+    try:
+        parser.feed(value)
+        parser.close()
+        return re.sub(r"(?<=[一-龥])\s+(?=[一-龥])", "", re.sub(r"\s+", " ", " ".join(parser.parts)).strip())
+    except Exception:
+        return re.sub(r"<[^>]+>", " ", value)
+
+
 def decode_header(value: str | None) -> str:
     if not value:
         return ""
     parts: list[str] = []
     for chunk, charset in email.header.decode_header(value):
         if isinstance(chunk, bytes):
-            parts.append(chunk.decode(charset or "utf-8", errors="replace"))
+            parts.append(safe_decode(chunk, charset))
         else:
             parts.append(chunk)
     return "".join(parts).strip()
@@ -45,26 +79,61 @@ def message_text(msg: email.message.Message, limit: int = 8000) -> str:
                 continue
             payload = part.get_payload(decode=True)
             if payload:
-                chunks.append(payload.decode(part.get_content_charset() or "utf-8", errors="replace"))
+                decoded = safe_decode(payload, part.get_content_charset())
+                chunks.append(html_to_text(decoded) if part.get_content_subtype() == "html" else decoded)
     else:
         payload = msg.get_payload(decode=True)
         if payload:
-            chunks.append(payload.decode(msg.get_content_charset() or "utf-8", errors="replace"))
+            chunks.append(safe_decode(payload, msg.get_content_charset()))
     text = re.sub(r"\s+", " ", " ".join(chunks)).strip()
     return text[:limit]
 
 
-def classify_message(subject: str, body: str) -> str:
+def is_recruitment_message(subject: str, body: str) -> bool:
     text = f"{subject} {body}".lower()
-    rules = [
-        ("offer", r"录用|offer|聘用|入职通知"),
-        ("rejected", r"未通过|不予录用|感谢参与|regret|rejected"),
+    job_context = re.search(r"招聘|校招|网申|简历|笔试|测评|面试|投递|岗位|录用|未通过|不予录用|regret|rejected|算法工程师|校园", text, re.IGNORECASE)
+    strong_progress = re.search(r"感谢投递|投递成功|收到.*简历|申请进度|面试邀约|邀请.*(?:笔试|测评|面试)|在线(?:笔试|测评|考试)|录用通知|入职通知|\boffer\b|application received|application status", text, re.IGNORECASE)
+    non_job = re.search(r"steam|登录操作|安全提醒|验证码|chatgpt|openai|根据照片|newsletter|订阅", text, re.IGNORECASE)
+    generic_ad = re.search(r"智联推荐|点击投递|邀您投递|招聘正式启动|招聘火热进行中|推荐.*岗位|双选会|项目正式启动|培训生项目", text, re.IGNORECASE)
+    direct_subject_progress = re.search(r"感谢投递|投递成功|申请进度|邀请.*(?:笔试|测评|面试)|在线(?:笔试|测评|考试)|面试邀约|录用通知|未通过|不予录用|感谢你的关注与参与", subject, re.IGNORECASE)
+    if non_job and not strong_progress:
+        return False
+    if not job_context:
+        return False
+    if generic_ad and not direct_subject_progress:
+        return False
+    return True
+
+
+def classify_message(subject: str, body: str) -> str:
+    if not is_recruitment_message(subject, body):
+        return "irrelevant"
+    full_text = f"{subject} {body}".lower()
+    rejection_pattern = r"未通过|不予录用|很遗憾|遗憾地通知|暂时无法邀请|无法邀请.*后续|人才库|感谢你的关注与参与|regret|rejected"
+    if re.search(rejection_pattern, full_text, flags=re.IGNORECASE):
+        return "rejected"
+    subject_text = subject.lower()
+    subject_rules = [
+        ("offer", r"录用|offer|聘用|入职"),
+        ("rejected", r"未通过|不予录用|很遗憾|遗憾地通知|暂时无法邀请|无法邀请.*后续|人才库|感谢你的关注与参与|regret|rejected"),
+        ("assessment", r"测评|assessment|综合素质"),
+        ("written_test", r"笔试|在线考试|技术考试|专业考试|written test|online exam"),
         ("interview", r"面试|interview"),
-        ("written_test", r"笔试|在线考试|技术考试|written test|online exam"),
-        ("assessment", r"测评|assessment|在线测评|综合素质"),
         ("applied", r"投递成功|收到.*简历|感谢投递|application received|application status"),
     ]
-    for status, pattern in rules:
+    for status, pattern in subject_rules:
+        if re.search(pattern, subject_text, flags=re.IGNORECASE):
+            return status
+    text = f"{subject} {body}".lower()
+    body_rules = [
+        ("offer", r"录用|offer|聘用|入职通知"),
+        ("rejected", r"未通过|不予录用|很遗憾|遗憾地通知|暂时无法邀请|无法邀请.*后续|人才库|感谢你的关注与参与|regret|rejected"),
+        ("assessment", r"测评|assessment|在线测评|综合素质"),
+        ("written_test", r"笔试|在线考试|技术考试|专业考试|written test|online exam"),
+        ("interview", r"面试|interview"),
+        ("applied", r"投递成功|收到.*简历|感谢投递|application received|application status"),
+    ]
+    for status, pattern in body_rules:
         if re.search(pattern, text, flags=re.IGNORECASE):
             return status
     return "other"
@@ -118,13 +187,16 @@ def sync_imap(payload: dict[str, Any]) -> dict[str, Any]:
             subject = decode_header(msg.get("Subject"))
             sender = decode_header(msg.get("From"))
             body = message_text(msg)
+            message_status = classify_message(subject, body)
+            if message_status == "irrelevant":
+                continue
             messages.append({
                 "uid": uid.decode(errors="ignore"),
                 "subject": subject,
                 "sender": sender,
                 "date": parse_date(msg.get("Date")),
                 "snippet": body[:280],
-                "status": classify_message(subject, body),
+                "status": message_status,
             })
         return {"provider": provider_key, "folder": folder, "count": len(messages), "messages": messages}
     finally:
@@ -208,3 +280,6 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+
+
+
