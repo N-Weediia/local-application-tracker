@@ -21,32 +21,13 @@ const keywordRules = [
   ["llm", ["大模型","llm","生成式人工智能","推理引擎"]]
 ];
 
-const candidatePool = [
-  {id:"zhito",company:"挚途科技",city:"苏州",region:"长三角",role:"视觉 SLAM / 感知算法工程师",tags:["vision","stereo3d","pose","robot","slam","control","imu","cpp"],url:"https://zhito.zhiye.com/Campus"},
-  {id:"inovance",company:"汇川技术",city:"苏州 / 深圳",region:"长三角 + 珠三角",role:"AI 算法 / 机器人算法 / 嵌入式软件",tags:["robot","control","embedded","cpp","edgeai","imu"],url:"https://recruit.inovance.com/"},
-  {id:"dreame",company:"追觅科技",city:"苏州",region:"长三角",role:"智能算法 / 视觉算法 / 机器人算法",tags:["vision","robot","edgeai","embedded","python","cpp"],url:"https://dreame.zhiye.com/"},
-  {id:"xiaopeng",company:"小鹏汽车",city:"广州 / 深圳 / 上海",region:"珠三角 + 长三角",role:"智能驾驶感知 / 机器人视觉 / AI 算法",tags:["vision","stereo3d","pose","robot","edgeai","autonomous_driving","control"],url:"https://www.xiaopeng.com/join.html"},
-  {id:"smartsens",company:"思特威 SmartSens",city:"上海 / 深圳",region:"长三角 + 珠三角",role:"ISP / 图像算法 / 机器视觉算法",tags:["vision","image","isp","embedded","edgeai","cpp"],url:"https://campus.smartsenstech.com/campus_trends"},
-  {id:"xag",company:"极飞科技 XAG",city:"广州",region:"珠三角",role:"视觉 / 机器人 / 导航算法",tags:["vision","drone","robot","control","imu","stereo3d","edgeai"],url:"https://www.xa.com/about/career"},
-  {id:"tcl",company:"TCL",city:"深圳 / 惠州",region:"珠三角",role:"AI 算法 / 机器视觉 / 机器人研发",tags:["vision","image","robot","edgeai","embedded","isp"],url:"https://zhaopin.tcl.com/campus/recruiting.html?id=62"},
-  {id:"zte",company:"中兴通讯",city:"深圳 / 南京 / 上海",region:"珠三角 + 长三角",role:"AI 算法 / 软件开发 / 端侧智能",tags:["python","cpp","edgeai","embedded","llm","iot"],url:"https://job.zte.com.cn/cn/campus-recruitment/Recruitment_positions/freshstudent.html"},
-  {id:"quectel",company:"移远通信",city:"上海",region:"长三角",role:"嵌入式 / AI 算法 / 物联网视觉",tags:["embedded","iot","edgeai","cpp","python","vision"],url:"https://talent.quectel.com/"},
-  {id:"cmcc-hz",company:"中国移动杭州研发中心",city:"杭州",region:"长三角",role:"具身智能 / 机器人 / 大模型推理",tags:["robot","llm","edgeai","vision","multimodal","python"],url:"https://job.10086.cn/"},
-  {id:"gac",company:"广汽研究院",city:"广州",region:"珠三角",role:"智能驾驶感知 / 3D 视觉 / 车辆控制",tags:["autonomous_driving","vision","stereo3d","control","pose","cpp"],url:"https://www.gac.com.cn/cn/careers"},
-  {id:"ehang",company:"亿航智能",city:"广州",region:"珠三角",role:"飞行器视觉 / 导航 / 控制算法",tags:["drone","vision","control","imu","stereo3d","embedded"],url:"https://www.ehang.com/cn/career/"},
-  {id:"sensetime",company:"商汤科技",city:"上海",region:"长三角",role:"计算机视觉 / 多模态算法 / 端侧 AI",tags:["vision","multimodal","pose","python","edgeai","llm"],url:"https://www.sensetime.com/cn/careers"},
-  {id:"thundersoft",company:"中科创达",city:"上海 / 苏州",region:"长三角",role:"计算机视觉 / Android AI / 边缘智能",tags:["embedded","vision","edgeai","cpp","python","image"],url:"https://www.thundersoft.com/careers/"},
-  {id:"huaqin",company:"华勤技术",city:"上海 / 东莞",region:"长三角 + 珠三角",role:"相机算法 / 影像调优 / 嵌入式系统",tags:["image","vision","isp","embedded","edgeai","cpp"],url:"https://www.huaqin.com/join"},
-  {id:"nio",company:"蔚来",city:"上海 / 合肥",region:"长三角",role:"智能驾驶 / 视觉感知 / 机器人算法",tags:["autonomous_driving","vision","stereo3d","pose","edgeai","cpp"],url:"https://www.nio.com/careers"}
-];
-
-const companyProfiles = {
-  zhito:{type:"融资初创", funding:"unknown", verified:false, fundingLabel:"融资阶段未核实"}, inovance:{type:"知名企业", funding:"listed", verified:true, fundingLabel:"上市企业"}, dreame:{type:"知名企业", funding:"unknown", verified:false, fundingLabel:"融资阶段未核实"}, xiaopeng:{type:"大厂", funding:"listed", verified:true, fundingLabel:"上市企业"}, smartsens:{type:"知名企业", funding:"listed", verified:true, fundingLabel:"上市企业"}, xag:{type:"融资初创", funding:"unknown", verified:false, fundingLabel:"融资阶段未核实"}, tcl:{type:"大厂", funding:"listed", verified:true, fundingLabel:"上市企业"}, zte:{type:"大厂", funding:"listed", verified:true, fundingLabel:"上市企业"}, quectel:{type:"知名企业", funding:"listed", verified:true, fundingLabel:"上市企业"}, "cmcc-hz":{type:"央企", funding:"listed", verified:true, fundingLabel:"央企体系"}, gac:{type:"国企", funding:"listed", verified:true, fundingLabel:"国企体系"}, ehang:{type:"知名企业", funding:"listed", verified:true, fundingLabel:"上市企业"}, sensetime:{type:"知名企业", funding:"listed", verified:true, fundingLabel:"上市企业"}, thundersoft:{type:"知名企业", funding:"listed", verified:true, fundingLabel:"上市企业"}, huaqin:{type:"知名企业", funding:"listed", verified:true, fundingLabel:"上市企业"}, nio:{type:"大厂", funding:"listed", verified:true, fundingLabel:"上市企业"}
-};
+const recommendationEngine = TrackerRecommendations;
+let candidatePool = [...TrackerCatalog];
+let companyProfiles = Object.fromEntries(candidatePool.map(item => [item.id, item.profile]));
 const defaultPreferences = {priority:["大厂","央企","国企","知名企业","融资初创"], minFundingStage:"angel", requireFundingVerified:true, cities:[], regions:[]};
 const fundingRank = {unknown:0, angel:1, A:2, B:3, C:4, listed:5};
 function getPreferences(){ const p=state.preferences || {}; return {priority:Array.isArray(p.priority)&&p.priority.length?p.priority:defaultPreferences.priority, minFundingStage:p.minFundingStage || defaultPreferences.minFundingStage, requireFundingVerified:p.requireFundingVerified !== false, cities:Array.isArray(p.cities)?p.cities:[], regions:Array.isArray(p.regions)?p.regions:[]}; }
-function eligibleByPreference(candidate){ const profile=companyProfiles[candidate.id] || {type:"知名企业",funding:"unknown",verified:false}; const pref=getPreferences(); if(profile.type === "融资初创" && pref.requireFundingVerified && !profile.verified) return false; return (fundingRank[profile.funding] || 0) >= (fundingRank[pref.minFundingStage] || 1) || profile.type !== "融资初创"; }
+function eligibleByPreference(candidate){ const profile=companyProfiles[candidate.id] || {type:"知名企业",funding:"unknown",verified:false}; const pref=getPreferences(); if(!pref.priority.includes(profile.type)) return false; if(profile.type === "融资初创" && pref.requireFundingVerified && !profile.verified) return false; return (fundingRank[profile.funding] || 0) >= (fundingRank[pref.minFundingStage] || 1) || profile.type !== "融资初创"; }
 
 const candidateKeywordHints = {
   zhito:["视觉","SLAM","感知","标定","3D","姿态","机器人","控制","IMU"], inovance:["AI","机器人","运动控制","嵌入式","C++","实时"], dreame:["视觉","机器人","智能算法","端侧","嵌入式"], xiaopeng:["智能驾驶","3D","视觉","机器人","感知","控制"], smartsens:["ISP","图像","相机","机器视觉","C++"], xag:["视觉","机器人","导航","无人机","IMU","控制"], tcl:["AI","图像","机器人","嵌入式","ISP"], zte:["AI","软件","端侧","嵌入式","大模型"], quectel:["嵌入式","物联网","AI","通信","视觉"], "cmcc-hz":["具身智能","机器人","大模型","推理"], gac:["自动驾驶","3D","视觉","车辆控制","感知"], ehang:["飞行器","无人机","视觉","导航","控制"], sensetime:["计算机视觉","多模态","端侧 AI","大模型"], thundersoft:["计算机视觉","嵌入式","边缘智能","C++"], huaqin:["相机","影像","图像","ISP","嵌入式"], nio:["智能驾驶","视觉感知","3D","机器人"]
@@ -54,13 +35,30 @@ const candidateKeywordHints = {
 
 let providers = {};
 let state = loadState();
+if (Array.isArray(state.customCandidates)) {
+  for (const item of state.customCandidates) {
+    try { const candidate = validateCatalogEntry(item); if (!candidatePool.some(x => x.id === candidate.id || recommendationEngine.normalize(x.company) === recommendationEngine.normalize(candidate.company))) candidatePool.push(candidate); } catch { /* Leave invalid imported catalog rows out. */ }
+  }
+  companyProfiles = Object.fromEntries(candidatePool.map(item => [item.id, item.profile]));
+}
+recommendationEngine.migrateState(state, candidatePool);
 let resumeTags = new Set(state.resumeProfile?.tags || []);
 let resumeTerms = new Set(state.resumeProfile?.terms || []);
 
 function freshCandidate(candidate, score = 0, matches = []) { return {...candidate, score, matches, status:"wait", applied:false, checkedAt:""}; }
-function defaultState() { return {current: [], batchIndex: 0, history: [], mail: [], preferences: {...defaultPreferences}, resumeProfile: {tags: [], terms: [], label: "未上传简历", summary: ""}}; }
-function loadState() { try { const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || "null"); return saved && Array.isArray(saved.current) ? saved : defaultState(); } catch { return defaultState(); } }
-function saveState() { const safe = {...state, preferences:getPreferences(), resumeProfile: {tags:[...resumeTags], terms:[...resumeTerms], label: state.resumeProfile?.label || "已解析简历", summary: state.resumeProfile?.summary || ""}}; localStorage.setItem(STORAGE_KEY, JSON.stringify(safe)); }
+function defaultState() { return {current: [], batchIndex: 0, history: [], appliedIds: [], mail: [], preferences: {...defaultPreferences}, resumeProfile: {tags: [], terms: [], label: "未上传简历", summary: ""}}; }
+function loadState() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    const saved = JSON.parse(raw || "null");
+    if (!saved || !Array.isArray(saved.current)) return defaultState();
+    if (saved.schemaVersion !== 3 && !localStorage.getItem(`${STORAGE_KEY}_before_dedup3`)) {
+      try { localStorage.setItem(`${STORAGE_KEY}_before_dedup3`, raw); } catch { /* Keep loaded data even when backup storage is full. */ }
+    }
+    return saved;
+  } catch { return defaultState(); }
+}
+function saveState() { const safe = {...state, schemaVersion:3, appliedIds:Array.isArray(state.appliedIds)?state.appliedIds:[], preferences:getPreferences(), resumeProfile: {tags:[...resumeTags], terms:[...resumeTerms], label: state.resumeProfile?.label || "已解析简历", summary: state.resumeProfile?.summary || ""}}; localStorage.setItem(STORAGE_KEY, JSON.stringify(safe)); }
 function now() { return new Date().toLocaleString("zh-CN", {hour12:false}); }
 function escapeHtml(value) { return String(value ?? "").replace(/[&<>'"]/g, ch => ({"&":"&amp;","<":"&lt;",">":"&gt;","'":"&#39;","\"":"&quot;"}[ch])); }
 function statusClass(status) { return `status status-${status}`; }
@@ -88,7 +86,7 @@ function scoreCandidates(tags, terms) {
     if (!eligibleByPreference(candidate)) return null;
     const profile=companyProfiles[candidate.id] || {type:"知名企业"};
     const tagMatches = candidate.tags.filter(tag => tags.has(tag));
-    const hints = candidateKeywordHints[candidate.id] || [];
+    const hints = candidateKeywordHints[candidate.id] || candidate.keywords || candidate.role.split(/\s*\/\s*/);
     const termMatches = hints.filter(hint => [...terms].some(term => term.toLowerCase().includes(hint.toLowerCase()) || hint.toLowerCase().includes(term.toLowerCase())));
     const matches = [...new Set([...tagMatches, ...termMatches.map(term => `术语:${term}`)])].slice(0, 10);
     const priorityIndex = pref.priority.indexOf(profile.type);
@@ -101,13 +99,11 @@ function scoreCandidates(tags, terms) {
     return freshCandidate(candidate, score, [...new Set([...matches, ...locationMatches])].slice(0, 10));
   }).filter(Boolean).sort((a,b)=>b.score-a.score || a.company.localeCompare(b.company,"zh-CN"));
 }
-function chooseNextBatch() {
-  const used = new Set(state.history.map(item=>item.id));
-  const ranked = scoreCandidates(resumeTags, resumeTerms);
-  const available = ranked.filter(item=>!used.has(item.id));
-  const selected = available.slice(0,5);
-  if (selected.length < 5) selected.push(...ranked.filter(item=>!selected.some(x=>x.id===item.id)).slice(0,5-selected.length));
-  return selected;
+function chooseNextBatch(preserveCurrent = false) {
+  return recommendationEngine.selectBatch(scoreCandidates(resumeTags, resumeTerms), state, {preserveCurrent});
+}
+function refreshRecommendations(preserveCurrent = true) {
+  state.current = chooseNextBatch(preserveCurrent);
 }
 function applyResumeText(text, label) {
   resumeTags = extractResumeTags(text);
@@ -117,7 +113,7 @@ function applyResumeText(text, label) {
   state.current = chooseNextBatch();
   state.batchIndex = state.history.length ? Math.floor(state.history.length / 5) : 0;
   saveState(); renderAll();
-  toast(`已提取 ${resumeTags.size} 类标签和 ${resumeTerms.size} 个技术术语，并生成 5 家推荐`);
+  toast(`已提取简历信息；当前有 ${state.current.length} 家未投递候选`);
 }
 
 function renderProfile() {
@@ -130,31 +126,42 @@ function renderProfile() {
 }
 
 function renderCandidates() {
-  const current = state.current.length === 5 ? state.current : chooseNextBatch();
-  state.current = current;
-  const checked = current.filter(x=>x.applied).length;
+  const current = state.current;
+  const remaining = scoreCandidates(resumeTags, resumeTerms).filter(item => !recommendationEngine.isProcessed(item, state)).length;
+  const checked = state.processedCompanies.length;
   document.getElementById("batchNo").textContent = state.batchIndex + 1;
-  document.getElementById("batchLabel").textContent = `第 ${state.batchIndex + 1} 批`;
+  document.getElementById("batchLabel").textContent = `${current.length} 家未投递候选`;
   document.getElementById("checkedCount").textContent = checked;
-  document.getElementById("progressBar").style.width = `${checked / 5 * 100}%`;
+  document.getElementById("progressBar").style.width = `${Math.min(100, checked / candidatePool.length * 100)}%`;
+  document.getElementById("poolSummary").textContent = `目录 ${candidatePool.length} 家 · 已记录/排除 ${checked} 家 · 符合偏好且未投递 ${remaining} 家`;
+  const exhaustion = document.getElementById("poolExhaustion");
+  exhaustion.hidden = current.length === 5;
+  exhaustion.textContent = current.length ? `符合条件且未投递的企业仅剩 ${current.length} 家。其余为待补充席位；不会重新推荐已投递企业。可导入新企业目录或调整偏好。` : "当前目录中符合偏好的企业已全部处理。请导入新企业目录或调整偏好；已投递企业不会循环出现。";
   document.getElementById("candidateBody").innerHTML = current.map((x,i)=>`<tr>
     <td><label class="check"><input type="checkbox" data-apply="${i}" ${x.applied?"checked":""}>我已投递</label><small class="muted">${x.checkedAt ? `勾选于 ${escapeHtml(x.checkedAt)}` : ""}</small></td>
     <td><div class="company">${escapeHtml(x.company)}</div><div class="city">${escapeHtml(x.city)} · <span class="tag">${escapeHtml(x.region)}</span></div><div><span class="tag">${escapeHtml((companyProfiles[x.id]||{}).type || "知名企业")}</span><span class="tag">${escapeHtml((companyProfiles[x.id]||{}).fundingLabel || "阶段未核实")}</span></div></td>
-    <td><strong>${escapeHtml(x.role)}</strong></td>
+    <td><strong>${escapeHtml(x.role)}</strong><div class="muted">建议检索方向，非实时在招职位</div></td>
     <td>${x.matches?.length ? `命中：${x.matches.map(m=>`<span class="tag">${escapeHtml(m)}</span>`).join("")}` : "等待简历摘要匹配"}</td>
     <td class="score">${x.score || 0}</td>
     <td><select data-status="${i}">${Object.entries(statusLabels).map(([key,label])=>`<option value="${key}" ${x.status===key?"selected":""}>${label}</option>`).join("")}</select><div style="margin-top:5px"><span class="${statusClass(x.status)}">${statusLabels[x.status]}</span></div></td>
-    <td><a href="${escapeHtml(x.url)}" target="_blank" rel="noopener">官方入口 ↗</a></td>
-  </tr>`).join("");
+    <td><a href="${escapeHtml(x.url)}" target="_blank" rel="noopener">招聘入口 ↗</a><div class="muted">${x.reviewedAt ? `入口核对：${escapeHtml(x.reviewedAt)}` : "历史目录：开放状态待确认"}</div></td>
+  </tr>`).join("") + Array.from({length:5-current.length}, (_, i) => `<tr class="vacancy"><td>—</td><td colspan="6">待补充席位 ${i+1}：暂无符合偏好且未投递的新企业，可在下方补充目录。</td></tr>`).join("");
   document.querySelectorAll("input[data-apply]").forEach(el=>el.addEventListener("change", event=>toggleApplied(Number(event.target.dataset.apply), event.target.checked)));
   document.querySelectorAll("select[data-status]").forEach(el=>el.addEventListener("change", event=>updateStatus(Number(event.target.dataset.status), event.target.value)));
 }
 function toggleApplied(index, checked) {
-  const item = state.current[index]; item.applied = checked; item.checkedAt = checked ? now() : ""; if (checked && item.status === "wait") item.status = "applied"; if (!checked && item.status === "applied") item.status = "wait";
-  if (state.current.every(x=>x.applied)) { state.history.push(...state.current.map(x=>({...x, batch:state.batchIndex}))); state.batchIndex++; state.current = chooseNextBatch(); toast("本批 5 家已归档，下一批已载入"); }
-  saveState(); renderAll();
+  if (!checked || !state.current[index]) return;
+  const company = state.current[index].company;
+  recommendationEngine.completeApplication(state, state.current[index], candidatePool);
+  refreshRecommendations(); saveState(); renderAll();
+  toast(`${company} 已归档并排除，已补入新的候选`);
 }
-function updateStatus(index, status) { const item=state.current[index]; item.status=status; if (status !== "wait") { item.applied=true; item.checkedAt=item.checkedAt || now(); } saveState(); renderAll(); }
+function updateStatus(index, status) {
+  if (status === "wait" || !state.current[index]) return;
+  recommendationEngine.completeApplication(state, state.current[index], candidatePool, status);
+  refreshRecommendations(); saveState(); renderAll();
+  toast("投递状态已归档，该企业不再推荐");
+}
 
 function renderMail() {
   const mail = state.mail || [];
@@ -163,12 +170,8 @@ function renderMail() {
   list.innerHTML = mail.length ? mail.map(m=>`<article class="mail-item"><div class="top"><strong>${escapeHtml(m.subject || "无主题")}</strong><span class="${statusClass(m.status || "other")}">${statusLabels[m.status] || "其他"}</span></div><small>${escapeHtml(m.sender)} · ${escapeHtml(m.date)}</small><p>${escapeHtml(m.snippet)}</p></article>`).join("") : "<p class='muted'>尚未同步邮件。</p>";
 }
 function matchMailToApplications() {
-  for (const message of state.mail || []) {
-    const text = `${message.subject || ""} ${message.sender || ""} ${message.snippet || ""}`.toLowerCase();
-    for (const item of state.current) {
-      if (text.includes(item.company.toLowerCase())) { item.status = message.status || item.status; item.applied = item.status !== "wait"; item.checkedAt = item.applied ? (item.checkedAt || now()) : item.checkedAt; }
-    }
-  }
+  recommendationEngine.ingestMail(state, candidatePool);
+  refreshRecommendations();
 }
 async function loadProviders() {
   try { providers = await fetch("/api/providers").then(r=>r.json()); } catch { providers = {}; }
@@ -182,18 +185,56 @@ async function loadDemoMail() { const data=await fetch("/api/sync/mock",{method:
 
 function renderHistory() { document.getElementById("historyBody").innerHTML = state.history.length ? state.history.map(x=>`<tr><td>第 ${(x.batch || 0)+1} 批</td><td>${escapeHtml(x.company)}</td><td>${escapeHtml(x.role)}</td><td>${escapeHtml(x.checkedAt || "—")}</td><td><span class="${statusClass(x.status)}">${statusLabels[x.status] || "其他"}</span></td></tr>`).join("") : "<tr><td colspan='5' class='muted'>尚无已完成批次。</td></tr>"; }
 function renderPreferences(){ const p=getPreferences(); for(const [id,label] of [["prefLarge","大厂"],["prefCentral","央企"],["prefState","国企"],["prefKnown","知名企业"],["prefStartup","融资初创"]]){ const el=document.getElementById(id); if(el) el.checked=p.priority.includes(label); } const min=document.getElementById("prefFunding"); if(min) min.value=p.minFundingStage; const verified=document.getElementById("prefVerified"); if(verified) verified.checked=p.requireFundingVerified; const citySelect=document.getElementById("citySelect"); if(citySelect) [...citySelect.options].forEach(option=>option.selected=p.cities.includes(option.value)); for(const [id,label] of [["prefYangtze","长三角"],["prefPearl","珠三角"],["prefGba","粤港澳大湾区"],["prefJingjinji","京津冀"],["prefChengyu","成渝"]]){ const el=document.getElementById(id); if(el) el.checked=p.regions.includes(label); } const custom=document.getElementById("customRegion"); if(custom) custom.value=p.regions.filter(region=>!["长三角","珠三角","粤港澳大湾区","京津冀","成渝"].includes(region)).join("、"); }
-function renderAll() { renderProfile(); renderCandidates(); renderMail(); renderHistory(); renderPreferences(); }
+function renderExclusions() {
+  document.getElementById("processedList").innerHTML = state.processedCompanies.map(record => `<span class="tag" title="${escapeHtml(record.source)}">${escapeHtml(record.company)} · ${escapeHtml(statusLabels[record.status] || "已投递")}</span>`).join("") || "尚未登记已投递企业";
+}
+function renderAll() { renderProfile(); renderCandidates(); renderMail(); renderHistory(); renderPreferences(); renderExclusions(); }
 
 document.getElementById("resumeInput").addEventListener("change", async event=>{ const file=event.target.files?.[0]; if(!file)return; document.getElementById("resumeFileName").textContent=file.name; document.getElementById("resumeText").value=await file.text(); applyResumeText(document.getElementById("resumeText").value, file.name); });
 document.getElementById("recommendBtn").addEventListener("click",()=>applyResumeText(document.getElementById("resumeText").value,"粘贴/导入的简历"));
 document.getElementById("mailForm").addEventListener("submit",async event=>{ event.preventDefault(); const error=document.getElementById("mailError"); error.hidden=true; const form=new FormData(event.target); const payload=Object.fromEntries(form.entries()); payload.port=Number(payload.port); payload.sinceDays=Number(payload.sinceDays); payload.limit=Number(payload.limit); try { const data=await syncMail(payload); state.mail=data.messages || []; matchMailToApplications(); saveState(); renderAll(); document.getElementById("password").value=""; toast(`同步完成：${data.count || 0} 封`); } catch (err) { error.textContent=err.message; error.hidden=false; } });
 document.getElementById("demoMailBtn").addEventListener("click",loadDemoMail);
 document.getElementById("exportBtn").addEventListener("click",()=>{ const blob=new Blob([JSON.stringify(state,null,2)],{type:"application/json"}); const a=document.createElement("a"); a.style.display="none"; a.href=URL.createObjectURL(blob); a.download=`application-tracker-${new Date().toISOString().slice(0,10)}.json`; document.body.appendChild(a); a.click(); setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); },1000); });
-document.getElementById("importInput").addEventListener("change",async event=>{ const file=event.target.files?.[0]; if(!file)return; try { const imported=JSON.parse(await file.text()); if(!Array.isArray(imported.current)) throw new Error("文件缺少 current 字段"); state=imported; resumeTags=new Set(state.resumeProfile?.tags || []); resumeTerms=new Set(state.resumeProfile?.terms || []); saveState(); renderAll(); toast("已导入本地进度"); } catch(err) { toast(`导入失败：${err.message}`); } });
+document.getElementById("importInput").addEventListener("change",async event=>{ const file=event.target.files?.[0]; if(!file)return; try { const imported=JSON.parse(await file.text()); if(!Array.isArray(imported.current)) throw new Error("文件缺少 current 字段"); state=recommendationEngine.ensureState(imported); recommendationEngine.migrateState(state, candidatePool); resumeTags=new Set(state.resumeProfile?.tags || []); resumeTerms=new Set(state.resumeProfile?.terms || []); refreshRecommendations(); saveState(); renderAll(); toast("已导入本地进度"); } catch(err) { toast(`导入失败：${err.message}`); } });
 document.getElementById("applyPrefsBtn")?.addEventListener("click",()=>{ const selected=[]; for(const [id,label] of [["prefLarge","大厂"],["prefCentral","央企"],["prefState","国企"],["prefKnown","知名企业"],["prefStartup","融资初创"]]) if(document.getElementById(id)?.checked) selected.push(label); const cities=[...(document.getElementById("citySelect")?.selectedOptions || [])].map(option=>option.value).slice(0,5); const regions=[]; for(const [id,label] of [["prefYangtze","长三角"],["prefPearl","珠三角"],["prefGba","粤港澳大湾区"],["prefJingjinji","京津冀"],["prefChengyu","成渝"]]) if(document.getElementById(id)?.checked) regions.push(label); const custom=(document.getElementById("customRegion")?.value || "").split(/[、,，]/).map(x=>x.trim()).filter(Boolean); state.preferences={priority:selected.length?selected:defaultPreferences.priority,minFundingStage:document.getElementById("prefFunding").value,requireFundingVerified:document.getElementById("prefVerified").checked,cities,regions:[...new Set([...regions,...custom])]}; state.current=chooseNextBatch(); saveState(); renderAll(); toast("偏好已应用，城市和地区优先级已生效"); });
+document.getElementById("recordAppliedBtn").addEventListener("click", () => {
+  const input = document.getElementById("appliedCompanyInput");
+  const names = input.value.split(/[\n\r、,，;；]+/).map(value => value.trim()).filter(Boolean);
+  if (!names.length) { toast("请填写企业名称，每行一家"); return; }
+  recommendationEngine.addCompanies(state, names, candidatePool);
+  refreshRecommendations(); saveState(); renderAll(); input.value = "";
+  toast(`已登记 ${names.length} 家已投递企业`);
+});
+function validateCatalogEntry(item) {
+  for (const key of ["company","city","role","url"]) if (typeof item[key] !== "string" || !item[key].trim()) throw new Error(`目录缺少 ${key}`);
+  const url = new URL(item.url);
+  if (!["http:","https:"].includes(url.protocol)) throw new Error("招聘入口必须是 HTTP/HTTPS 地址");
+  const profile = item.profile || {type:item.type || "知名企业", funding:item.funding || "unknown", verified:false, fundingLabel:"用户导入：待核实"};
+  if (!defaultPreferences.priority.includes(profile.type)) throw new Error("不支持的企业类型");
+  return {...item, id:item.id || `custom-${recommendationEngine.normalize(item.company)}`, company:item.company.trim(),
+    aliases:Array.isArray(item.aliases) ? item.aliases.filter(x => typeof x === "string") : [],
+    tags:Array.isArray(item.tags) ? item.tags.filter(x => typeof x === "string") : [], region:item.region || "", profile, url:url.href};
+}
+document.getElementById("catalogInput").addEventListener("change", async event => {
+  const file=event.target.files?.[0]; if (!file) return;
+  try {
+    const parsed=JSON.parse(await file.text()); const rows=Array.isArray(parsed) ? parsed : parsed.companies;
+    if (!Array.isArray(rows) || rows.length > 1000) throw new Error("请导入最多 1000 家的 JSON 数组或 companies 数组");
+    const validated=rows.map(validateCatalogEntry); let added=0;
+    for (const row of validated) {
+      if (candidatePool.some(x => x.id===row.id || recommendationEngine.normalize(x.company)===recommendationEngine.normalize(row.company))) continue;
+      candidatePool.push(row); companyProfiles[row.id]=row.profile;
+      state.customCandidates=[...(state.customCandidates || []), row]; added++;
+    }
+    recommendationEngine.migrateState(state, candidatePool); refreshRecommendations(); saveState(); renderAll();
+    toast(`目录新增 ${added} 家，已自动排除已投递企业`);
+  } catch(error) { toast(`目录导入失败：${error.message}`); }
+  event.target.value="";
+});
 document.querySelectorAll(".tab").forEach(tab=>tab.addEventListener("click",()=>{ document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active")); document.querySelectorAll(".panel").forEach(x=>x.classList.remove("active")); tab.classList.add("active"); document.getElementById(tab.dataset.tab).classList.add("active"); }));
 
-if (!state.current.length) { state.current = chooseNextBatch(); saveState(); }
-renderAll(); loadProviders();
+matchMailToApplications();
+refreshRecommendations();
+saveState(); renderAll(); loadProviders();
 
 

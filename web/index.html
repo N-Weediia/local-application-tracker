@@ -4,9 +4,9 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Local Application Tracker</title>
-  <link rel="stylesheet" href="/styles.css">
+  <link rel="stylesheet" href="/styles.css?v=dedup3">
 </head>
-<body>
+<body data-app-version="dedup3">
   <main class="shell">
     <header class="hero">
       <div>
@@ -41,14 +41,22 @@
 
     <section id="tracker" class="panel active">
       <div class="metrics">
-        <div class="metric card"><span>当前批次</span><strong id="batchNo">1</strong><small>始终保持 5 家</small></div>
-        <div class="metric card"><span>已勾选</span><strong><span id="checkedCount">0</span> / 5</strong><div class="bar"><i id="progressBar"></i></div></div>
+        <div class="metric card"><span>投递进度批次</span><strong id="batchNo">1</strong><small>最多 5 家未投递候选</small></div>
+        <div class="metric card"><span>累计记录 / 排除企业</span><strong id="checkedCount">0</strong><div class="bar"><i id="progressBar"></i></div></div>
         <div class="metric card"><span>简历提取标签</span><strong id="skillCount">0</strong><small id="skillHint">等待简历</small></div>
         <div class="metric card"><span>邮箱消息</span><strong id="mailCount">0</strong><small>本地快照</small></div>
       </div>
       <div class="card table-card">
-        <div class="section-heading"><div><h2>当前推荐岗位</h2><p id="recommendationHint">勾选 5 家后自动载入下一批；推荐分数来自你上传简历的分类标签、自动提取术语与岗位标签。</p></div><span id="batchLabel" class="batch-label"></span></div>
+        <div class="section-heading"><div><h2>未投递企业与建议岗位方向</h2><p id="recommendationHint">勾选即归档并补入新企业。历史批次、手工登记和邮箱记录共同去重；有限目录用完后会提示补充，不会循环旧名单。</p><p id="poolSummary" aria-live="polite"></p></div><span id="batchLabel" class="batch-label"></span></div>
+        <div id="poolExhaustion" class="notice" role="status" hidden></div>
         <div class="table-wrap"><table><thead><tr><th>已投递</th><th>企业 / 地区</th><th>建议岗位</th><th>匹配依据</th><th>匹配分</th><th>进展</th><th>入口</th></tr></thead><tbody id="candidateBody"></tbody></table></div>
+        <div class="directory-controls"><label class="button file-button">补充企业目录 JSON<input type="file" id="catalogInput" accept="application/json,.json"></label><span class="muted">本地目录不包含实时岗位爬虫；岗位开放情况以招聘官网为准。</span></div>
+        <details class="processed-panel" open><summary>已投递企业排除清单（本机保存）</summary>
+          <p class="muted">可批量补录没有邮件回执的投递；每行一家，也支持逗号分隔。未出现在当前目录中的企业也会保留，今后补充目录时继续排除。</p>
+          <textarea id="appliedCompanyInput" rows="3" placeholder="填写已投递企业名称，每行一家" aria-label="已投递企业名称"></textarea>
+          <button class="button" id="recordAppliedBtn">登记已投递并排除</button>
+          <div id="processedList" aria-live="polite"></div>
+        </details>
       </div>
     </section>
 
@@ -56,14 +64,14 @@
       <div class="card">
         <div class="section-heading"><div><h2>2. 同步主流邮箱</h2><p>程序在本机通过 IMAP 读取邮件标题和摘要，密码只存在于本次请求内。</p></div><span class="privacy-badge">不发送 / 不删除</span></div>
         <form id="mailForm" class="mail-form">
-          <label>提供商<select id="provider"></select></label>
-          <label>邮箱账号<input id="username" type="email" autocomplete="off" required placeholder="name@example.com"></label>
-          <label>授权码 / 应用专用密码<input id="password" type="password" autocomplete="off" required></label>
-          <label>IMAP 服务器<input id="host" required></label>
-          <label>端口<input id="port" type="number" min="1" max="65535" required></label>
-          <label>文件夹<input id="folder" value="INBOX"></label>
-          <label>最近几天<input id="sinceDays" type="number" min="1" max="3650" value="60"></label>
-          <label>最多读取<input id="limit" type="number" min="1" max="300" value="100"></label>
+          <label>提供商<select id="provider" name="provider"></select></label>
+          <label>邮箱账号<input id="username" name="username" type="email" autocomplete="off" required placeholder="name@example.com"></label>
+          <label>授权码 / 应用专用密码<input id="password" name="password" type="password" autocomplete="off" required></label>
+          <label>IMAP 服务器<input id="host" name="host" required></label>
+          <label>端口<input id="port" name="port" type="number" min="1" max="65535" required></label>
+          <label>文件夹<input id="folder" name="folder" value="INBOX"></label>
+          <label>最近几天<input id="sinceDays" name="sinceDays" type="number" min="1" max="3650" value="60"></label>
+          <label>最多读取<input id="limit" name="limit" type="number" min="1" max="300" value="100"></label>
           <div class="form-actions"><button class="button primary" type="submit">开始同步</button><span id="providerNote" class="muted"></span></div>
         </form>
         <div id="mailError" class="error" hidden></div>
@@ -77,9 +85,8 @@
     <footer>Local Application Tracker · MIT License · 仅在本机运行</footer>
   </main>
   <div id="toast" class="toast" role="status"></div>
-  <script src="/app.js?v=20261004"></script>
+  <script src="/catalog.js?v=dedup3"></script>
+  <script src="/recommendations.js?v=dedup3"></script>
+  <script src="/app.js?v=dedup3"></script>
 </body>
 </html>
-
-
-
