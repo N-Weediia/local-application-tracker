@@ -21,12 +21,12 @@ test('finite catalog: consume through exhaustion without recycling even one comp
   assert.deepEqual(engine.selectBatch(catalog, state), []);
 });
 
-test('27 entries: final two stay as two; no padding with applied companies', () => {
+test('expanded catalog: final two stay as two; no padding with applied companies', () => {
   const state = freshState();
-  engine.addCompanies(state, catalog.slice(0,25).map(x => x.company), catalog);
+  engine.addCompanies(state, catalog.slice(0,-2).map(x => x.company), catalog);
   const batch = engine.selectBatch(catalog, state);
   assert.equal(batch.length,2);
-  assert.deepEqual(batch.map(x=>x.id), catalog.slice(25).map(x=>x.id));
+  assert.deepEqual(batch.map(x=>x.id), catalog.slice(-2).map(x=>x.id));
 });
 
 test('old batch 7 snapshots migrate history and partial current checkboxes', () => {
@@ -101,4 +101,21 @@ test('a fresh catalog addition after exhaustion produces genuinely new recommend
   assert.equal(engine.selectBatch(catalog,state).length,0);
   const added={id:'future',company:'合成新增企业'};
   assert.deepEqual(engine.selectBatch([...catalog,added],state).map(x=>x.id),['future']);
+});
+
+test('October directory update refills an exhausted old directory without reviving its companies', () => {
+  const additions = require('../data/company-updates/2026-10-18.json');
+  const addedIds = new Set(additions.map(x=>x.id));
+  const oldDirectory = catalog.filter(x=>!addedIds.has(x.id));
+  const state = freshState();
+  engine.addCompanies(state, oldDirectory.map(x=>x.company), oldDirectory);
+  state.mail = [{subject:'比亚迪汽车校招笔试通知', status:'written_test'},
+    {subject:'中国电信面试邀请', status:'interview'}];
+  engine.migrateState(state,catalog);
+  const batch = engine.selectBatch(catalog,state);
+  assert.equal(batch.length,5);
+  assert.ok(batch.every(x=>addedIds.has(x.id)));
+  assert.ok(!batch.some(x=>['byd','teleai'].includes(x.id)));
+  assert.equal(new Set(catalog.map(x=>x.id)).size,catalog.length);
+  assert.equal(new Set(catalog.map(x=>engine.normalize(x.company))).size,catalog.length);
 });

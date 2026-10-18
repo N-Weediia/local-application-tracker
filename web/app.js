@@ -140,7 +140,7 @@ function renderCandidates() {
   document.getElementById("candidateBody").innerHTML = current.map((x,i)=>`<tr>
     <td><label class="check"><input type="checkbox" data-apply="${i}" ${x.applied?"checked":""}>我已投递</label><small class="muted">${x.checkedAt ? `勾选于 ${escapeHtml(x.checkedAt)}` : ""}</small></td>
     <td><div class="company">${escapeHtml(x.company)}</div><div class="city">${escapeHtml(x.city)} · <span class="tag">${escapeHtml(x.region)}</span></div><div><span class="tag">${escapeHtml((companyProfiles[x.id]||{}).type || "知名企业")}</span><span class="tag">${escapeHtml((companyProfiles[x.id]||{}).fundingLabel || "阶段未核实")}</span></div></td>
-    <td><strong>${escapeHtml(x.role)}</strong><div class="muted">建议检索方向，非实时在招职位</div></td>
+    <td><strong>${escapeHtml(x.role)}</strong><div class="muted">建议检索方向，非实时在招职位</div><small class="muted">${escapeHtml(x.availability || "具体开放状态与毕业届别以官方招聘入口为准")}</small></td>
     <td>${x.matches?.length ? `命中：${x.matches.map(m=>`<span class="tag">${escapeHtml(m)}</span>`).join("")}` : "等待简历摘要匹配"}</td>
     <td class="score">${x.score || 0}</td>
     <td><select data-status="${i}">${Object.entries(statusLabels).map(([key,label])=>`<option value="${key}" ${x.status===key?"selected":""}>${label}</option>`).join("")}</select><div style="margin-top:5px"><span class="${statusClass(x.status)}">${statusLabels[x.status]}</span></div></td>
