@@ -119,3 +119,22 @@ test('October directory update refills an exhausted old directory without revivi
   assert.equal(new Set(catalog.map(x=>x.id)).size,catalog.length);
   assert.equal(new Set(catalog.map(x=>engine.normalize(x.company))).size,catalog.length);
 });
+
+test('second directory expansion preserves two pending companies and excludes earlier applications to newly added companies', () => {
+  const additions = require('../data/company-updates/2026-10-19.json');
+  const addedIds = new Set(additions.map(x=>x.id));
+  const previousCatalog = catalog.filter(x=>!addedIds.has(x.id));
+  const state = freshState();
+  engine.addCompanies(state, previousCatalog.slice(0,-2).map(x=>x.company), previousCatalog);
+  state.current = engine.selectBatch(previousCatalog,state);
+  const pendingIds = state.current.map(x=>x.id);
+  assert.equal(pendingIds.length,2);
+  engine.addCompanies(state,['小马智行'],previousCatalog);
+  state.mail = [{subject:'理想汽车校园招聘：本次未通过',status:'rejected'}];
+  engine.migrateState(state,catalog);
+  const batch = engine.selectBatch(catalog,state);
+  assert.equal(batch.length,5);
+  assert.deepEqual(batch.slice(0,2).map(x=>x.id),pendingIds);
+  assert.ok(batch.slice(2).every(x=>addedIds.has(x.id)));
+  assert.ok(!batch.some(x=>['pony','li-auto'].includes(x.id)));
+});
